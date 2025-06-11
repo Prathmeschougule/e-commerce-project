@@ -28,25 +28,23 @@ A modern full-stack eCommerce web application built using **Spring Boot**, **Rea
 
 ## ✅ Features
 
-### User Side
+### 👤 User Side
 - User Registration & Login with JWT Authentication
 - Browse Products
 - View Product Details
 - Add to Cart & Checkout
 - Order Summary Page
 
-### Admin Panel
+### 🛠️ Admin Panel
 - Add / Edit / Delete Products
 - Manage Orders
 - Role-based access using Spring Security
 
 ---
 
----
-
 ## 🚀 Getting Started
 
-### Prerequisites
+### 🔍 Prerequisites
 - Java 17+
 - Node.js & npm
 - MySQL
@@ -54,47 +52,51 @@ A modern full-stack eCommerce web application built using **Spring Boot**, **Rea
 
 ---
 
-### 🔙 Backend Setup
+## 🔙 Backend Setup
 
-```bash
+
 cd backend
+Configure application.properties or application.yml with your DB and JWT settings:
+spring.datasource.url=jdbc:mysql://localhost:3306/comwen_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+
+jwt.secret=your_jwt_secret_key
 
 Run the application:
 mvn spring-boot:run
+
 🔜 Frontend Setup
 cd frontend
+
+
 Install dependencies:
 npm install
-Start the app:
+
+Start the React app:
 npm start
-Make sure the backend server is running on a different port (e.g., 8080), and frontend uses a proxy for API calls (configure in package.json):
+
+Ensure your backend is running on port 8080 and configure proxy in frontend/package.json:
 "proxy": "http://localhost:8080"
 
 🔐 Authentication
-JWT Token is stored in local storage
-All protected endpoints are secured with Spring Security
-Token is sent in headers: Authorization: Bearer <token>
+JWT Token is stored in browser localStorage
+All protected endpoints use Spring Security
+JWT sent via HTTP header:
+Authorization: Bearer <your_token>
 
 ☁️ Deployment (Optional)
-Deploy Backend on AWS
-Use AWS EC2 instance for deployment
-Store images (if any) on S3
-Use AWS RDS for MySQL database
-Deploy Frontend
-Host React build using S3 + CloudFront or Netlify/Vercel
+Backend
+Deploy on AWS EC2
+Use AWS RDS for MySQL
+Store assets (images, etc.) on S3
 
- To Do
- Add payment integration (e.g., Razorpay/Stripe)
- Email notifications
- Product search and filters
- Responsive mobile UI
+Frontend
+Build React App using:
+npm run build
 
-🤝 Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-📜 License
-This project is licensed under the MIT License.
-```bash
 🙋‍♂️ Developed By
 Prathmesh Chougule
 Java Full Stack Developer
+LinkedIn | GitHub
+
