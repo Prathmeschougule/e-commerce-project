@@ -7,7 +7,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,5 +23,11 @@ public class MyGlobalExceptionHandler {
             response.put(filedName,message);
         });
         return  new ResponseEntity<Map<String , String>>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public  ResponseEntity<String> myResourceNotFoundException (ResourceNotFoundException e){
+    String message = e.getMessage();
+    return new ResponseEntity<>(message ,HttpStatus.NOT_FOUND);
     }
 }
