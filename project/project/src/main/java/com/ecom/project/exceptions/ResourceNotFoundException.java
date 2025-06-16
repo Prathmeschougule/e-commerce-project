@@ -1,7 +1,6 @@
 package com.ecom.project.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
-
     String resourceName;
     String  filed;
     String filedName;

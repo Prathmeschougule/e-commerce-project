@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/api")
@@ -28,6 +26,12 @@ public class CategoryController {
         return new ResponseEntity<>(categories,HttpStatus.OK);
     }
 
+    @GetMapping("/public/categories/{categoryId}")
+    public ResponseEntity<Category> getByCategoriesId(@PathVariable Long categoryId){
+        Category categories = categoryService.getByCategoriesId(categoryId);
+        return new ResponseEntity<>(categories,HttpStatus.OK);
+    }
+
     @PostMapping("/public/categories")
     public ResponseEntity<String> createCategories( @Valid @RequestBody Category Category){
          categoryService.createCategory(Category);
@@ -36,28 +40,15 @@ public class CategoryController {
 
     @DeleteMapping("/admin/categories/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable  Long categoryId){
-
-        try {
             String status =  categoryService.deleteCategory(categoryId);
             return  new ResponseEntity<>(status, HttpStatus.OK);
-        }catch (ResponseStatusException e){
-            return  new ResponseEntity<>(e.getReason(),e.getStatusCode());
-        }
+
     }
 
     @PutMapping("/public/categories/{categoryId}")
-    public ResponseEntity<String>updateCategory(@RequestBody Category category,@PathVariable Long categoryId){
-        try {
+    public ResponseEntity<String>updateCategory( @Valid @RequestBody Category category,@PathVariable Long categoryId){
             Category saveCategory = categoryService.updateCategory(category,categoryId);
-
             return new ResponseEntity<>("Update Category Id " + categoryId ,HttpStatus.CREATED);
-
-        }catch (ResponseStatusException e){
-
-            return  new ResponseEntity<>(e.getReason(),e.getStatusCode());
-        }
-
-
     }
 
 }
