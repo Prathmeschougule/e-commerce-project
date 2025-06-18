@@ -1,5 +1,7 @@
 package com.ecom.project.service;
 import com.ecom.project.model.Category;
+import com.ecom.project.payload.CategoryDto;
+import com.ecom.project.payload.CategoryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -7,9 +9,9 @@ import java.util.List;
 
 
 public interface CategoryService {
-   List<Category> getAllCategories();
-   void createCategory(Category category);
-   String deleteCategory(Long categoryId);
-   Category updateCategory(Category category, Long categoryId);
-   Category getByCategoriesId(Long categoryId);
+   CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize);
+   CategoryDto createCategory(CategoryDto categoryDto);
+   CategoryDto deleteCategory(Long categoryId);
+   CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId);
+   CategoryDto getByCategoriesId(Long categoryId);
 }
