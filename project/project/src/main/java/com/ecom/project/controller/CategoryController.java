@@ -1,4 +1,5 @@
 package com.ecom.project.controller;
+import com.ecom.project.config.AppConstant;
 import com.ecom.project.model.Category;
 import com.ecom.project.payload.CategoryDto;
 import com.ecom.project.payload.CategoryResponse;
@@ -23,7 +24,8 @@ public class CategoryController {
 //    }
 
     @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponse> getAllCategories(@RequestParam(name = "pageNumber") Integer pageNumber, @RequestParam(name = "pageSize" ) Integer  pageSize){
+    public ResponseEntity<CategoryResponse> getAllCategories(@RequestParam(name = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER ,required = false) Integer pageNumber,
+                                                             @RequestParam(name = "pageSize" ,defaultValue = AppConstant.PAGE_SIZE , required = false) Integer  pageSize){
          CategoryResponse categoryResponse = categoryService.getAllCategories(pageNumber,pageSize);
         return new ResponseEntity<>(categoryResponse,HttpStatus.OK);
     }
