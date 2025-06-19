@@ -15,4 +15,5 @@ public class CategoryDto {
      @NotBlank(message = "Category name must not be blank")
      @Size(min = 5, message = "Category must contain at least 5 characters")
      private  String categoryName;
+
 }
