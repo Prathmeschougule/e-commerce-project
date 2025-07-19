@@ -19,7 +19,7 @@ public class Product {
     private String productDescription;
     private  Integer quantity;
     private String image;
-    private  double prize;
+    private  double price;
     private  double discount;
     private  double specialPrize;
 
