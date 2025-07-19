@@ -11,7 +11,11 @@ import com.ecom.project.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,10 +33,12 @@ public class ProductServiceImp implements ProductService {
 
 
     @Override
-    public ProductDto addProduct(Long categoryId, Product product) {
+    public ProductDto addProduct(Long categoryId, ProductDto productDTO) {
 
         Category category = categoryRepository.findById(categoryId).
                 orElseThrow(()-> new ResourceNotFoundException("Category","categoryId",categoryId));
+
+        Product product = modelMapper.map(productDTO,Product.class);
 
         product.setImage("default.png");
         product.setCategory(category);
@@ -97,12 +103,14 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ProductDto updateProduct(Product product, Long productId) {
+    public ProductDto updateProduct(ProductDto productDTO, Long productId) {
 
 //         get the Existing Product  from the DB
 
         Product productFromDb= productRepository.findById(productId).
                 orElseThrow(()->new ResourceNotFoundException("Product","productId",productId));
+
+        Product product = modelMapper.map(productFromDb,Product.class);
 
 //        update the product  from the request body
 
@@ -120,6 +128,51 @@ public class ProductServiceImp implements ProductService {
 
         return  modelMapper.map(saveProduct,ProductDto.class);
 
+
+    }
+
+    @Override
+    public ProductDto deleteProduct(Long productId) {
+//       get the product from the db
+        Product product = productRepository.findById(productId).
+                orElseThrow(()-> new ResourceNotFoundException("ProductDto","productId",productId));
+//       then delete the product
+        productRepository.delete(product);
+//        return
+        return  modelMapper.map(product,ProductDto.class);
+    }
+
+    @Override
+    public ProductDto updateProductImage(Long productId, MultipartFile image) {
+
+//        get the Product from the DB
+       Product productFromDB = productRepository.findById(productId)
+                .orElseThrow(()-> new ResourceNotFoundException("Product","productId",productId));
+
+//        upload image to the server
+//        get the file name of the upload image
+        String path = "/image";
+        String filename =  uploadImage(path, image);
+
+//        Updating to the new file name to the project
+        productFromDB.setImage(filename);
+
+//        save updated product
+        Product  updateProduct = productRepository.save(productFromDB);
+
+//      Return the DTO after Mapping product to DTO
+        return modelMapper.map(updateProduct,ProductDto.class);
+    }
+
+    private String uploadImage(String path, MultipartFile file) {
+
+//        File Name Of Current / Original file
+        String originalFileName = file.getName();
+
+//        Generate a unique file name
+        String randomId = UUID.randomUUID().toString();
+        String filename = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
+        String filePath = path + File.pathSeparator + filename;
 
     }
 
