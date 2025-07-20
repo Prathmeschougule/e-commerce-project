@@ -10,10 +10,14 @@ import com.ecom.project.repository.CategoryRepository;
 import com.ecom.project.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +34,12 @@ public class ProductServiceImp implements ProductService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${project.image}")
+    private  String path;
 
 
     @Override
@@ -143,7 +153,7 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ProductDto updateProductImage(Long productId, MultipartFile image) {
+    public ProductDto updateProductImage(Long productId, MultipartFile image) throws IOException {
 
 //        get the Product from the DB
        Product productFromDB = productRepository.findById(productId)
@@ -151,8 +161,8 @@ public class ProductServiceImp implements ProductService {
 
 //        upload image to the server
 //        get the file name of the upload image
-        String path = "/image";
-        String filename =  uploadImage(path, image);
+//        String path = "project/images";
+        String filename = fileService.uploadImage(path, image);
 
 //        Updating to the new file name to the project
         productFromDB.setImage(filename);
@@ -164,17 +174,7 @@ public class ProductServiceImp implements ProductService {
         return modelMapper.map(updateProduct,ProductDto.class);
     }
 
-    private String uploadImage(String path, MultipartFile file) {
 
-//        File Name Of Current / Original file
-        String originalFileName = file.getName();
-
-//        Generate a unique file name
-        String randomId = UUID.randomUUID().toString();
-        String filename = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
-        String filePath = path + File.pathSeparator + filename;
-
-    }
 
 
 }

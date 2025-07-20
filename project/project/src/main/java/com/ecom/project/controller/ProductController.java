@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api")
 public class ProductController {
@@ -64,7 +66,7 @@ public class ProductController {
 
     @PutMapping("/products/{productId}/image")
     public ResponseEntity<ProductDto>updateProductImage(@PathVariable Long productId,
-                                                        @RequestParam("image")MultipartFile image){
+                                                        @RequestParam("image")MultipartFile image) throws IOException {
 
         ProductDto updatedProduct = productService.updateProductImage(productId,image);
         return  new ResponseEntity<>(updatedProduct,HttpStatus.OK);
