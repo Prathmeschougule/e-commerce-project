@@ -1,10 +1,13 @@
 package com.ecom.project.controller;
 
+import com.ecom.project.config.AppConstant;
 import com.ecom.project.payload.ProductDto;
 import com.ecom.project.payload.ProductResponse;
 import com.ecom.project.service.ProductService;
+import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +23,7 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping("/admin/categories/{categoryId}/product")
-    public ResponseEntity<ProductDto> addProduct(@RequestBody  ProductDto productDTO ,
+    public ResponseEntity<ProductDto> addProduct(@Valid  @RequestBody  ProductDto productDTO ,
                                                  @PathVariable Long categoryId){
         
          ProductDto productDto = productService.addProduct(categoryId,productDTO);
@@ -30,8 +33,13 @@ public class ProductController {
     }
 
     @GetMapping("/public/products")
-    public ResponseEntity<ProductResponse> getAllProducts(){
-        ProductResponse productResponse = productService.getAllProducts();
+    public ResponseEntity<ProductResponse> getAllProducts(
+            @RequestParam(name= "pageNumber", defaultValue = AppConstant.PAGE_NUMBER , required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstant.PAGE_SIZE , required = false) Integer pageSize,
+            @RequestParam(name= "sortBy", defaultValue = AppConstant.SORT_PRODUCTS_BY , required = false) String sortBy,
+            @RequestParam(name = "sortOrder" ,defaultValue = AppConstant.SORT_DIR, required = false) String sortOrder
+    ){
+        ProductResponse productResponse = productService.getAllProducts(pageNumber,pageSize,sortBy, sortOrder);
         return  new  ResponseEntity<>(productResponse,HttpStatus.OK);
 
     }
@@ -51,7 +59,7 @@ public class ProductController {
     }
 
     @PutMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDTO , @PathVariable Long productId){
+    public ResponseEntity<ProductDto> updateProduct(@Valid  @RequestBody ProductDto productDTO , @PathVariable Long productId){
 
         ProductDto productedProductDto = productService.updateProduct(productDTO,productId);
 

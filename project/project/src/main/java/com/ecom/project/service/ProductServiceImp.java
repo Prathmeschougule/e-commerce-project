@@ -1,6 +1,7 @@
 package com.ecom.project.service;
 
 
+import com.ecom.project.exceptions.APIException;
 import com.ecom.project.exceptions.ResourceNotFoundException;
 import com.ecom.project.model.Category;
 import com.ecom.project.model.Product;
@@ -11,15 +12,15 @@ import com.ecom.project.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,36 +45,77 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public ProductDto addProduct(Long categoryId, ProductDto productDTO) {
-
+// Check  if product already  present or not
         Category category = categoryRepository.findById(categoryId).
                 orElseThrow(()-> new ResourceNotFoundException("Category","categoryId",categoryId));
 
         Product product = modelMapper.map(productDTO,Product.class);
 
-        product.setImage("default.png");
-        product.setCategory(category);
+   // Check  if product already  present or not
 
-        double specialPrice =   product.getPrice() -(product.getDiscount() * 0.01) * product.getPrice();
-        product.setSpecialPrize(specialPrice);
+        boolean isProductNotPresent = true;
 
-        Product saveProduct = productRepository.save(product);
+        List<Product> products = category.getProducts();
 
-        return modelMapper.map(saveProduct,ProductDto.class);
+        for (int i = 0; i < products.size(); i++) {
+
+            if (products.get(i).getProductName().equals(productDTO.getProductName())){
+                isProductNotPresent = false;
+                break;
+            }
+
+        }
+
+        if (isProductNotPresent){
+            product.setImage("default.png");
+            product.setCategory(category);
+
+            double specialPrice =   product.getPrice() -(product.getDiscount() * 0.01) * product.getPrice();
+            product.setSpecialPrize(specialPrice);
+
+            Product saveProduct = productRepository.save(product);
+
+            return modelMapper.map(saveProduct,ProductDto.class);
+
+        }else {
+
+            throw  new APIException("Product is already exist !!");
+        }
+
     }
 
     @Override
-    public ProductResponse getAllProducts() {
+    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-       List<Product> products = productRepository.findAll();
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")?
+                Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
+        Pageable pageableDetails = PageRequest.of(pageNumber,pageSize,sortByAndOrder);
+        Page<Product> productPage = productRepository.findAll(pageableDetails);
+
+
+       List<Product> products = productPage.getContent();
+
+       if (products.isEmpty()){
+           throw new APIException("No Product Till Now");
+       }
 
        List<ProductDto> productDto = products.stream()
                .map(product ->modelMapper.map(product,ProductDto.class))
                .collect(Collectors.toList());
 
+       if(products.isEmpty()){
+           throw new APIException("No product exist !!");
+       }
 
        ProductResponse productResponse = new ProductResponse();
        productResponse.setContent(productDto);
+       productResponse.setPageNumber(productPage.getNumber());
+       productResponse.setPageSize(productPage.getSize());
+       productResponse.setTotalPage(productResponse.getTotalPage());
+       productResponse.setTotalElements(productPage.getTotalElements());
+       productResponse.setLastPage(productPage.isLast());
 
        return  productResponse;
     }
