@@ -110,10 +110,12 @@ public class ProductServiceImp implements ProductService {
        }
 
        ProductResponse productResponse = new ProductResponse();
+
        productResponse.setContent(productDto);
+
        productResponse.setPageNumber(productPage.getNumber());
        productResponse.setPageSize(productPage.getSize());
-       productResponse.setTotalPage(productResponse.getTotalPage());
+       productResponse.setTotalPage(productPage.getTotalPages());
        productResponse.setTotalElements(productPage.getTotalElements());
        productResponse.setLastPage(productPage.isLast());
 
@@ -121,18 +123,37 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ProductResponse searchCategory(Long categoryId) {
+    public ProductResponse searchCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(()-> new ResourceNotFoundException("category","categoryId",categoryId));
 
-        List<Product> products =  productRepository.findByCategoryOrderByPriceAsc(category);
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")?
+                Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageableDetails = PageRequest.of(pageNumber,pageSize,sortByAndOrder);
+        Page<Product> productPage = productRepository.findByCategoryOrderByPriceAsc(category , pageableDetails);
+
+
+        List<Product> products = productPage.getContent();
 
         List<ProductDto> productDtos = products.stream()
                 .map(product -> modelMapper.map(product,ProductDto.class))
                 .collect(Collectors.toList());
 
+        if (products.isEmpty()){
+            throw new APIException(category.getCategoryName()+  " Category Dose Not Exist !!");
+
+        }
+
         ProductResponse productResponse = new ProductResponse();
+
+        productResponse.setPageNumber(productPage.getNumber());
+        productResponse.setPageSize(productPage.getSize());
+        productResponse.setTotalElements(productPage.getTotalElements());
+        productResponse.setTotalElements(productPage.getTotalElements());
+        productResponse.setLastPage(productPage.isLast());
 
         productResponse.setContent(productDtos);
 
@@ -140,16 +161,34 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ProductResponse searchProductByKeyword(String keyword) {
+    public ProductResponse searchProductByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-        List<Product> products =  productRepository.findByProductNameLikeIgnoreCase(keyword);
 
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")?
+                Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageableDetails = PageRequest.of(pageNumber,pageSize,sortByAndOrder);
+        Page<Product> productPage = productRepository.findByProductNameLikeIgnoreCase(keyword, pageableDetails);
+
+
+        List<Product> products = productPage.getContent();
         List<ProductDto> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product,ProductDto.class))
                 .toList();
 
+        if (products.isEmpty()){
+            throw  new APIException("Product Not Found With This Keyword :" + keyword  );
+        }
+
         ProductResponse productResponse = new ProductResponse();
             productResponse.setContent(productDTOS);
+        productResponse.setPageNumber(productPage.getNumber());
+        productResponse.setPageSize(productPage.getSize());
+        productResponse.setTotalPage(productResponse.getTotalPage());
+        productResponse.setTotalElements(productPage.getTotalElements());
+        productResponse.setLastPage(productPage.isLast());
+
             return productResponse;
 
     }

@@ -41,6 +41,7 @@ public class CategoryServiceImp implements CategoryService {
         Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
 
         List<Category> category = categoryPage.getContent();
+
         if (category.isEmpty())
             throw  new APIException("No Category Create Till Now ");
 
@@ -48,6 +49,9 @@ public class CategoryServiceImp implements CategoryService {
         List<CategoryDto> categoryDTOS = category.stream()
                 .map(categories ->  modelMapper.map(categories, CategoryDto.class))
                 .toList();
+
+
+
 
 //       Create a  new object of categoryResponse and  there set the categoryDto and return the categoryResponse
 
