@@ -66,4 +66,46 @@ spring.datasource.username=your_username
 spring.datasource.password=your_password
 
 jwt.secret=your_jwt_secret_key
+
 Run the application:
+mvn spring-boot:run
+
+
+🔜 Frontend Setup
+cd frontend
+
+Install dependencies:
+npm install
+
+Ensure your backend is running on port 8080 and configure proxy in frontend/package.json:
+"proxy": "http://localhost:8080"
+
+
+🔐 Authentication
+JWT Token is stored in browser localStorage
+
+All protected endpoints use Spring Security
+
+JWT sent via HTTP header:
+
+Authorization: Bearer <your_token>
+
+
+☁️ Deployment (Optional)
+Backend
+Deploy on AWS EC2
+
+Use AWS RDS for MySQL
+
+Store assets (images, etc.) on S3
+
+Frontend
+Build React App using:
+npm run build
+
+🙋‍♂️ Developed By
+Prathmesh Chougule
+Java Full Stack Developer
+LinkedIn | GitHub
+
+
