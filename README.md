@@ -1,3 +1,6 @@
+> 🚧 **Project Status: Under Development**  
+> This application is currently in active development. Features may change, and bugs may exist.
+
 # 🛒 Comwen - Full Stack eCommerce Web Application
 
 A modern full-stack eCommerce web application built using **Spring Boot**, **React.js**, and deployed on **AWS**. The application supports user authentication, product listing, secure checkout, and admin product management.
@@ -54,9 +57,10 @@ A modern full-stack eCommerce web application built using **Spring Boot**, **Rea
 
 ## 🔙 Backend Setup
 
-
+```bash
 cd backend
 Configure application.properties or application.yml with your DB and JWT settings:
+
 spring.datasource.url=jdbc:mysql://localhost:3306/comwen_db
 spring.datasource.username=your_username
 spring.datasource.password=your_password
@@ -66,29 +70,33 @@ jwt.secret=your_jwt_secret_key
 Run the application:
 mvn spring-boot:run
 
+
 🔜 Frontend Setup
 cd frontend
-
 
 Install dependencies:
 npm install
 
-Start the React app:
-npm start
-
 Ensure your backend is running on port 8080 and configure proxy in frontend/package.json:
 "proxy": "http://localhost:8080"
 
+
 🔐 Authentication
 JWT Token is stored in browser localStorage
+
 All protected endpoints use Spring Security
+
 JWT sent via HTTP header:
+
 Authorization: Bearer <your_token>
+
 
 ☁️ Deployment (Optional)
 Backend
 Deploy on AWS EC2
+
 Use AWS RDS for MySQL
+
 Store assets (images, etc.) on S3
 
 Frontend
@@ -99,4 +107,5 @@ npm run build
 Prathmesh Chougule
 Java Full Stack Developer
 LinkedIn | GitHub
+
 
