@@ -5,15 +5,21 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CollectionId;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name = "users")
+@Table(name = "users",
+        uniqueConstraints = {
+                 @UniqueConstraint(columnNames = "userName"),
+                @UniqueConstraint(columnNames = "email")
+        })
 public class User {
 
     @Id
@@ -22,6 +28,7 @@ public class User {
 
     @NotBlank
     @Size(max=20)
+    @Column(name = "userName")
     private String userName;
 
     @NotBlank
@@ -31,6 +38,7 @@ public class User {
     @NotBlank
     @Size(max = 50)
     @Email
+    @Column(name = "email")
     private String email;
 
     public User(String userName, String password, String email) {
@@ -38,4 +46,16 @@ public class User {
         Password = password;
         this.email = email;
     }
+
+    @Getter
+    @Setter
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> role = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+    orphanRemoval = true)
+    private Set<Product> product = new HashSet<>();
 }
