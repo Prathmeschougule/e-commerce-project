@@ -45,7 +45,7 @@ public class User {
 
     public User(String userName, String password, String email) {
         this.userName = userName;
-        Password = password;
+        this.Password = password;
         this.email = email;
     }
 
@@ -55,7 +55,7 @@ public class User {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> role = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 
     @Getter
     @Setter
@@ -72,7 +72,4 @@ public class User {
     private Set<Product> product ;
 
 
-    public void setRoles(Set<Role> userRoles) {
-
-    }
 }
