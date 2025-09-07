@@ -72,4 +72,7 @@ public class User {
     private Set<Product> product ;
 
 
+    public void setRoles(Set<Role> userRoles) {
+
+    }
 }

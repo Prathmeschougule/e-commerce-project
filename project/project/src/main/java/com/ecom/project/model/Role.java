@@ -13,7 +13,6 @@ import lombok.ToString;
 @Table(name = "roles")
 public class Role {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="role_id")
@@ -27,5 +26,9 @@ public class Role {
     public Role(AppRole roleName, Long roleId) {
         this.roleName = roleName;
         this.roleId = roleId;
+    }
+
+    public Role(AppRole appRole) {
+
     }
 }
