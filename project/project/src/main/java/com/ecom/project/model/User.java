@@ -35,17 +35,17 @@ public class User {
 
     @NotBlank
     @Size(max = 120)
-    private String Password;
+    private String password;
 
     @NotBlank
-    @Size(max = 50)
-    @Email
+    @Email(message = "must be a well-formed email address")
+    @Size(max = 50, message = "size must be between 0 and 50")
     @Column(name = "email")
     private String email;
 
     public User(String userName, String password, String email) {
         this.userName = userName;
-        this.Password = password;
+        this.password = password;
         this.email = email;
     }
 
@@ -70,6 +70,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
     orphanRemoval = true)
     private Set<Product> product ;
+
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public Set<Role> getRoles() { return roles; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
 
 
 }
