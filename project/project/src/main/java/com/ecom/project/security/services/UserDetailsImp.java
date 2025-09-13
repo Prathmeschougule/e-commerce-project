@@ -37,17 +37,15 @@ public  class UserDetailsImp implements UserDetails {
         this.authorities = authorities;
     }
 
-    public static UserDetailsImp build(User user){
-
-        List<GrantedAuthority>authorities = user.getRoles().stream()
+    public static UserDetailsImp build(User user) {
+        List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                 .collect(Collectors.toList());
-
-        return  new UserDetailsImp(
+        return new UserDetailsImp(
                 user.getUserId(),
                 user.getUserName(),
+                user.getEmail(), // Note: Constructor expects email before password
                 user.getPassword(),
-                user.getEmail(),
                 authorities
         );
     }

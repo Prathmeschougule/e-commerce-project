@@ -33,20 +33,21 @@ public class User {
     @Column(name = "userName")
     private String userName;
 
+    @Column(name = "email", nullable = false, unique = true)
+    @NotBlank(message = "Email cannot be blank")
+    @Size(max = 100, message = "Email must be less than 100 characters")
+    private String email;
+
     @NotBlank
     @Size(max = 120)
     private String password;
 
-    @NotBlank
-    @Email(message = "must be a well-formed email address")
-    @Size(max = 50, message = "size must be between 0 and 50")
-    @Column(name = "email")
-    private String email;
 
-    public User(String userName, String password, String email) {
+
+    public User(String userName, String email, String password) {
         this.userName = userName;
-        this.password = password;
         this.email = email;
+        this.password = password;
     }
 
     @Getter

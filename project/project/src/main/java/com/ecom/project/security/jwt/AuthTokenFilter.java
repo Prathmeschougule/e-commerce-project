@@ -32,6 +32,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         logger.debug("AuthTokenFilter called for URI: {}", request.getRequestURI());
+
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/api/auth/")) {
+            System.out.println("Skipping JWT validation for: " + requestURI);
+            filterChain.doFilter(request, response); // Skip JWT validation for /api/auth/**
+            return;
+        }
+
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
@@ -57,9 +65,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
-        String jwt = jwtUtils.getJwtFromHeader(request);
+        String jwt = jwtUtils.getJwtFromCookies(request);
         logger.debug("AuthTokenFilter.java: {}", jwt);
         return jwt;
     }
+
+
 }
 
