@@ -25,10 +25,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,7 +78,7 @@ public class AuthController {
                 .collect(Collectors.toList());
 
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
-                userDetails.getUsername(), roles);
+                userDetails.getUsername(), roles,jwtCookie.toString());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                 jwtCookie.toString())
@@ -161,62 +158,38 @@ public class AuthController {
         }
     }
 
-//    @PostMapping("/signup")
-//    public ResponseEntity<?> registerUser( @Valid  @RequestBody SignupRequest signupRequest){
-//       if (userRepository.existsByUserName(signupRequest.getUsername())){
-//           return ResponseEntity
-//                   .badRequest()
-//                   .body(new MessageResponse("Error : user name is already taken !!"));
-//       }
-//        if (userRepository.existsByEmail(signupRequest.getEmail())){
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error : email id  is already taken !!"));
-//        }
-//
-//        User user = new User(
-//                signupRequest.getUsername(),
-//                signupRequest.getEmail(),
-//               encoder.encode(signupRequest.getPassword())
-//        );
-//
-//        Set<String> strRole = signupRequest.getRole();
-//        Set<Role> roles = new HashSet<>();
-//
-//        if (strRole == null){
-//            Role  userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
-//                    .orElseThrow(()->new RuntimeException("Error:Role is not found "));
-//
-//            roles.add(userRole);
-//
-//        }else {
-//            strRole.forEach(role -> {
-//                switch (role){
-//                    case "admin":
-//                        Role adminRole = roleRepository.findByRoleName(AppRole.ROLE_ADMIN)
-//                                .orElseThrow(()->new RuntimeException("Error:Role is not found "));
-//                        roles.add(adminRole);
-//                        break;
-//
-//                    case "seller":
-//                        Role sellerRole = roleRepository.findByRoleName(AppRole.ROLE_SELLER)
-//                                .orElseThrow(()->new RuntimeException("Error:Role is not found "));
-//                        roles.add(sellerRole);
-//                        break;
-//
-//                    default:
-//                        Role  userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
-//                                .orElseThrow(()->new RuntimeException("Error:Role is not found "));
-//
-//                        roles.add(userRole);
-//                }
-//            });
-//        }
-//
-//         user.setRoles(roles);
-//         userRepository.save(user);
-//         return ResponseEntity.ok(new MessageResponse("User Register Succsessfully!!"));
-//
-//    }
+    @GetMapping("/username")
+    public String currentUserName(Authentication authentication){
+
+        if (authentication != null)
+            return authentication.getName();
+        else
+            return "";
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserDetails(Authentication authentication){
+
+        UserDetailsImp userDetails = (UserDetailsImp) authentication.getPrincipal();
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
+                userDetails.getUsername(), roles);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<?> signOutUser() {
+        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new MessageResponse("You Have Been Signed Out !!"));
+    }
 
 }

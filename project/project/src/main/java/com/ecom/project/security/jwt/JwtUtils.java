@@ -29,29 +29,34 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     @Value("${spring.ecom.app.jwtCookiesName}")
-    private String jwtCookies;
+    private String jwtCookies;   // ✅ only "springBootEcom"
 
-
-
-    public  String getJwtFromCookies(HttpServletRequest request){
-        Cookie cookie = WebUtils.getCookie(request,jwtCookies);
-
-        if (cookie != null){
-            return cookie.getValue();
-        }else {
-            return  null;
+    public String getJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (jwtCookies.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
-
+        return null;
     }
 
-    public ResponseCookie generateJwtCookie(UserDetailsImp userPrinciple){
-        String jwt = generateTokenFromUsername(userPrinciple.getUsername());
-        ResponseCookie cookie = ResponseCookie.from(jwtCookies,jwt)
-                .path("/api")
-                .maxAge(24*60*60)
-                .httpOnly(false)
+    public ResponseCookie generateJwtCookie(UserDetailsImp userPrincipal) {
+        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
+        return ResponseCookie.from(jwtCookies, jwt)
+                .path("/")
+                .httpOnly(true)
+                .maxAge(24 * 60 * 60)
                 .build();
-        return cookie;
+    }
+
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie.from(jwtCookies, "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .build();
     }
 
     public String generateTokenFromUsername(String username) {
@@ -65,8 +70,9 @@ public class JwtUtils {
 
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser()
-                        .verifyWith((SecretKey) key())
-                .build().parseSignedClaims(token)
+                .verifyWith((SecretKey) key())
+                .build()
+                .parseSignedClaims(token)
                 .getPayload().getSubject();
     }
 
@@ -76,17 +82,10 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            System.out.println("Validate");
             Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(authToken);
             return true;
-        } catch (MalformedJwtException e) {
+        } catch (Exception e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
     }
