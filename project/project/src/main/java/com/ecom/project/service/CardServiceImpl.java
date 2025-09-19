@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -101,6 +102,7 @@ public class CardServiceImpl implements   CardService{
         return cardDTO;
     }
 
+
     private Card createCard(){
         Card  userCard = cardRepository.findCardByEmail(authUtil.loggedInEmail());
         if(userCard != null){
@@ -114,4 +116,51 @@ public class CardServiceImpl implements   CardService{
 
         return  newCard;
     }
+
+    @Override
+    public List<CardDTO> getAllCards() {
+     List<Card> cards = cardRepository.findAll();
+
+     if (cards.isEmpty()){
+         throw new APIException("No Card Exist ");
+     }
+
+     List<CardDTO> cardDTOS= cards.stream()
+
+             .map(card -> {
+                 CardDTO cardDTO= modelMapper.map(card,CardDTO.class);
+                 List<ProductDto> products = card.getCardItems().stream()
+                         .map(p -> modelMapper.map(p.getProduct(),ProductDto.class))
+                         .collect(Collectors.toList());
+
+                 cardDTO.setProduct(products);
+
+                 return cardDTO;
+             }).collect(Collectors.toList());
+
+     return cardDTOS;
+    }
+
+    @Override
+    public CardDTO getCard(String emailId, Long cardId) {
+
+        Card card = cardRepository.findCardByEmailAndCardId(emailId,cardId);
+
+        if (card ==  null){
+            throw  new ResourceNotFoundException("Card","cardId",cardId);
+        }
+
+        CardDTO cardDTO = modelMapper.map(card, CardDTO.class);
+
+        card.getCardItems().forEach(c -> c.getProduct().setQuantity(c.getQuantity()));
+
+        List<ProductDto> products =  card.getCardItems().stream()
+                .map( p -> modelMapper.map(p.getProduct(),ProductDto.class))
+                .toList();
+
+        cardDTO.setProduct(products);
+
+         return  cardDTO;
+    }
+
 }
