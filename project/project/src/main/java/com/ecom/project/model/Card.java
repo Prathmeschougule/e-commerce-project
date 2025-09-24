@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class Card {
     private User user ;
 
     @OneToMany(mappedBy = "card" , cascade = {CascadeType.PERSIST, CascadeType.MERGE,CascadeType.REMOVE},orphanRemoval = true)
-    private List<CardItems> cardItems = new ArrayList<>();
+    private List<CardItem> cardItems = new ArrayList<>();
 
     private Double totalPrice = 0.0;
 }

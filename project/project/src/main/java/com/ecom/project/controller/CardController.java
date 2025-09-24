@@ -48,4 +48,19 @@ public class CardController {
         CardDTO cardDTO = cardService.getCard(emailId,cardId);
         return  new ResponseEntity<CardDTO>(cardDTO , HttpStatus.OK);
     }
+
+    @PutMapping("/card/product/{productId}/quantity/{operation}")
+    public ResponseEntity<CardDTO> updateCardProduct(@PathVariable Long productId,
+                                                     @PathVariable String operation){
+
+        CardDTO cardDTO = cardService.updateCardQuantityInCard(productId,operation.equalsIgnoreCase("delete") ? -1 : 1 );
+        return  new ResponseEntity<CardDTO>(cardDTO,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/card/{cardId}/product/{productId}")
+    public  ResponseEntity<String> deleteProductFromCard(@PathVariable Long cardId,
+                                        @PathVariable Long productId){
+        String status = cardService.deleteProductFromCard(cardId,productId);
+        return new ResponseEntity<String>(status,HttpStatus.OK);
+    }
 }

@@ -3,7 +3,8 @@ package com.ecom.project.service;
 import com.ecom.project.exceptions.APIException;
 import com.ecom.project.exceptions.ResourceNotFoundException;
 import com.ecom.project.model.Card;
-import com.ecom.project.model.CardItems;
+import com.ecom.project.model.CardItem;
+import com.ecom.project.model.CardItem;
 import com.ecom.project.model.Product;
 import com.ecom.project.payload.CardDTO;
 import com.ecom.project.payload.ProductDto;
@@ -11,6 +12,7 @@ import com.ecom.project.repository.CardItemRepository;
 import com.ecom.project.repository.CardRepository;
 import com.ecom.project.repository.ProductRepository;
 import com.ecom.project.util.AuthUtil;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,12 +52,12 @@ public class CardServiceImpl implements   CardService{
 
 
 //      Perform Validation
-        CardItems cardItems = cardItemRepository.findCardItemsByProductIdAndCardId(
+        CardItem cardItem = cardItemRepository.findCardItemByProductIdAndCardId(
                 card.getCardId(),
                 productId
         );
 
-        if (cardItems != null){
+        if (cardItem != null){
             throw new APIException("Product"+ product.getProductName() + "Is Already Exist");
         }
 
@@ -68,7 +70,7 @@ public class CardServiceImpl implements   CardService{
                     + "Less then or equal to the quantity" + product.getQuantity() +"." );
         }
 
-        CardItems newCardItem = new CardItems();
+        CardItem newCardItem = new CardItem();
 
         newCardItem.setProduct(product);
         newCardItem.setCard(card);
@@ -88,7 +90,7 @@ public class CardServiceImpl implements   CardService{
 
         CardDTO cardDTO = modelMapper.map(card,CardDTO.class);
 
-        List<CardItems> cardItemss =  card.getCardItems();
+        List<CardItem> cardItemss =  card.getCardItems();
 
         Stream<ProductDto> productStream = cardItemss.stream()
                 .map(item ->{
@@ -161,6 +163,84 @@ public class CardServiceImpl implements   CardService{
         cardDTO.setProduct(products);
 
          return  cardDTO;
+    }
+
+    @Transactional
+    @Override
+    public CardDTO updateCardQuantityInCard(Long productId, Integer quantity) {
+
+        String email = authUtil.loggedInEmail();
+        Card userCard = cardRepository.findCardByEmail(email);
+        Long cardId = userCard.getCardId();
+
+        Card card = cardRepository.findById(cardId).
+                orElseThrow(() -> new ResourceNotFoundException("Card","cardId",cardId));
+
+
+        Product product = productRepository.findById(productId).
+                orElseThrow(()-> new ResourceNotFoundException("Product","productId",productId));
+
+        if (product.getQuantity() == 0){
+            throw  new APIException(product.getProductName() + " is not Available");
+        }
+
+        if (product.getQuantity() < quantity){
+            throw  new APIException("please make  on order of the" + product.getProductName()
+                    + "Less then or equal to the quantity" + product.getQuantity() +"." );
+        }
+
+
+        CardItem cardItem = cardItemRepository.findCardItemByProductIdAndCardId(productId,cardId);
+
+        if (cardItem == null){
+            throw new APIException("Product" + product.getProductName() + "Not Avilable ");
+        }
+
+        cardItem.setProductPrice(product.getSpecialPrize());
+        cardItem.setQuantity(cardItem.getQuantity() + quantity);
+        cardItem.setDiscount(product.getDiscount());
+        card.setTotalPrice(card.getTotalPrice() + (cardItem.getProductPrice() * quantity));
+
+        cardRepository.save(card);
+
+        CardItem updatedItem = cardItemRepository.save(cardItem);
+        if (updatedItem.getQuantity() == 0){
+            cardItemRepository.deleteById(updatedItem.getCardItemId());
+        }
+
+        CardDTO cardDTO = modelMapper.map(card,CardDTO.class);
+        List<CardItem> cardItems1 = card.getCardItems();
+
+        Stream<ProductDto> productStream  = cardItems1.stream().map(
+                item -> {
+                    ProductDto prd = modelMapper.map(item.getProduct(),ProductDto.class);
+                    prd.setQuantity(item.getQuantity());
+                    return prd;
+                }
+        );
+
+        cardDTO.setProduct(productStream.toList());
+
+        return cardDTO;
+    }
+
+    @Override
+    public String deleteProductFromCard(Long cardId, Long productId) {
+
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card","cardId",cardId));
+
+        CardItem cardItem = cardItemRepository.findCardItemByProductIdAndCardId(cardId,productId);
+
+        if (cardItem == null){
+            throw new ResourceNotFoundException("Product" , "productId" , productId);
+        }
+
+        card.setTotalPrice((card.getTotalPrice() - (cardItem.getProductPrice() * cardItem.getQuantity())));
+
+        cardItemRepository.deleteCardItemByProductIdAndCardId(cardId,productId);
+
+        return "Product" + cardItem.getProduct().getProductName() + "Removed from the card!!!";
     }
 
 }

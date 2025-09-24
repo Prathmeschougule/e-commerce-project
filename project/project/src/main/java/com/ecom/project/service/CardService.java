@@ -1,6 +1,7 @@
 package com.ecom.project.service;
 
 import com.ecom.project.payload.CardDTO;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -10,4 +11,9 @@ public interface CardService {
     List<CardDTO> getAllCards();
 
     CardDTO getCard(String emailId, Long cardId);
+
+    @Transactional
+    CardDTO updateCardQuantityInCard(Long productId, Integer quantity);
+
+    String deleteProductFromCard(Long cardId, Long productId);
 }
