@@ -52,7 +52,6 @@ public class CardController {
     @PutMapping("/card/product/{productId}/quantity/{operation}")
     public ResponseEntity<CardDTO> updateCardProduct(@PathVariable Long productId,
                                                      @PathVariable String operation){
-
         CardDTO cardDTO = cardService.updateCardQuantityInCard(productId,operation.equalsIgnoreCase("delete") ? -1 : 1 );
         return  new ResponseEntity<CardDTO>(cardDTO,HttpStatus.OK);
     }

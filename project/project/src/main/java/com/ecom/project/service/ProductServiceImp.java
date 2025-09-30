@@ -3,10 +3,13 @@ package com.ecom.project.service;
 
 import com.ecom.project.exceptions.APIException;
 import com.ecom.project.exceptions.ResourceNotFoundException;
+import com.ecom.project.model.Card;
 import com.ecom.project.model.Category;
 import com.ecom.project.model.Product;
+import com.ecom.project.payload.CardDTO;
 import com.ecom.project.payload.ProductDto;
 import com.ecom.project.payload.ProductResponse;
+import com.ecom.project.repository.CardRepository;
 import com.ecom.project.repository.CategoryRepository;
 import com.ecom.project.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
@@ -28,6 +31,9 @@ public class ProductServiceImp implements ProductService {
 
 
     @Autowired
+    private CardRepository cardRepository;
+
+    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -41,6 +47,9 @@ public class ProductServiceImp implements ProductService {
 
     @Value("${project.image}")
     private  String path;
+
+    @Autowired
+     private  CardService cardService;
 
 
     @Override
@@ -215,8 +224,23 @@ public class ProductServiceImp implements ProductService {
 //      save product
         Product saveProduct = productRepository.save(productFromDb);
 
-//      return product dto
+        List<Card> cards = cardRepository.findCardsByProductId(productId);
 
+        List<CardDTO> cartDTOs = cards.stream().map(cart -> {
+            CardDTO cartDTO = modelMapper.map(cart, CardDTO.class);
+
+            List<ProductDto> products = cart.getCardItems().stream()
+                    .map(p -> modelMapper.map(p.getProduct(),
+                            ProductDto.class)).collect(Collectors.
+                            toList());
+            cartDTO.setProduct(products);
+
+            return cartDTO;
+
+        }).collect(Collectors.toList());
+
+        cartDTOs.forEach(cart -> cardService.updateProductInCards(cart.getCardId(), productId));
+//      return product dto
         return  modelMapper.map(saveProduct,ProductDto.class);
 
 

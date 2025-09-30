@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CardItemRepository extends JpaRepository<CardItem,Long> {
 
+    @Modifying
     @Query("DELETE  FROM CardItem ci WHERE ci.card.id = ?1 AND ci.product.id = ?2")
     void deleteCardItemByProductIdAndCardId(Long cardId, Long productId);
 
@@ -16,6 +17,8 @@ public interface CardItemRepository extends JpaRepository<CardItem,Long> {
 //    @Query("DELETE FROM CardItem ci WHERE ci.card.id = ?1 AND ci.product.id = ?2")
 //    CardItem findCardItemsByProductIdAndCardId(Long cardId, Long productId);
 
-    @Query("DELETE FROM CardItem ci WHERE ci.card.id = ?1 AND ci.product.id = ?2")
-    CardItem findCardItemByProductIdAndCardId(Long productId, Long cardId);
+    @Query("SELECT ci FROM CardItem ci WHERE ci.card.id = ?1 AND ci.product.id = ?2")
+    CardItem findCardItemByProductIdAndCardId(  Long cardId,Long productId);
+
+
 }

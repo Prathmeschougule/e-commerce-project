@@ -38,7 +38,10 @@ public class CardServiceImpl implements   CardService{
    private ModelMapper modelMapper;
 
     @Autowired
-  private AuthUtil authUtil;
+    private AuthUtil authUtil;
+
+    @Autowired
+    private  FileService fileService;
 
     @Override
     public CardDTO addProductToCard(Long productId, Integer quantity) {
@@ -196,13 +199,22 @@ public class CardServiceImpl implements   CardService{
             throw new APIException("Product" + product.getProductName() + "Not Avilable ");
         }
 
-        cardItem.setProductPrice(product.getSpecialPrize());
-        cardItem.setQuantity(cardItem.getQuantity() + quantity);
-        cardItem.setDiscount(product.getDiscount());
-        card.setTotalPrice(card.getTotalPrice() + (cardItem.getProductPrice() * quantity));
+        int newQuantity = cardItem.getQuantity() + quantity;
 
-        cardRepository.save(card);
+        if (newQuantity < 0){
+            throw  new APIException("The Resulting Quantity Can Not Be Negative...!");
+        }
+        if (newQuantity == 0 ){
+            deleteProductFromCard(cardId,productId);
+        }else {
 
+            cardItem.setProductPrice(product.getSpecialPrize());
+            cardItem.setQuantity(cardItem.getQuantity() + quantity);
+            cardItem.setDiscount(product.getDiscount());
+            card.setTotalPrice(card.getTotalPrice() + (cardItem.getProductPrice() * quantity));
+            cardRepository.save(card);
+
+        }
         CardItem updatedItem = cardItemRepository.save(cardItem);
         if (updatedItem.getQuantity() == 0){
             cardItemRepository.deleteById(updatedItem.getCardItemId());
@@ -224,6 +236,7 @@ public class CardServiceImpl implements   CardService{
         return cardDTO;
     }
 
+    @Transactional
     @Override
     public String deleteProductFromCard(Long cardId, Long productId) {
 
@@ -241,6 +254,30 @@ public class CardServiceImpl implements   CardService{
         cardItemRepository.deleteCardItemByProductIdAndCardId(cardId,productId);
 
         return "Product" + cardItem.getProduct().getProductName() + "Removed from the card!!!";
+    }
+
+    @Override
+    public ProductDto updateProductInCards(Long cardId, Long productId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cardId));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        CardItem cardItem = cardItemRepository.findCardItemByProductIdAndCardId(cardId, productId);
+
+        if (cardItem == null) {
+            throw new APIException("Product " + product.getProductName() + " not available in the cart!!!");
+        }
+
+        double cartPrice = card.getTotalPrice()
+                - (cardItem.getProductPrice() * cardItem.getQuantity());
+
+        cardItem.setProductPrice(product.getSpecialPrize());
+        card.setTotalPrice(cartPrice
+                + (cardItem.getProductPrice() * cardItem.getQuantity()));
+
+        cardItem = cardItemRepository.save(cardItem);
     }
 
 }
