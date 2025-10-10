@@ -26,16 +26,16 @@ import java.util.stream.Stream;
 public class CardServiceImpl implements   CardService{
 
     @Autowired
-  private   CardRepository cardRepository;
+    private  CardRepository cardRepository;
 
     @Autowired
-  private   ProductRepository productRepository;
+    private  ProductRepository productRepository;
 
     @Autowired
-  private   CardItemRepository cardItemRepository;
+    private   CardItemRepository cardItemRepository;
 
     @Autowired
-   private ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
     private AuthUtil authUtil;
@@ -257,27 +257,27 @@ public class CardServiceImpl implements   CardService{
     }
 
     @Override
-    public ProductDto updateProductInCards(Long cardId, Long productId) {
+    public void updateProductInCards(Long cardId, Long productId) {
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cardId));
+                .orElseThrow(() -> new ResourceNotFoundException("Card", "cardId", cardId));
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        CardItem cardItem = cardItemRepository.findCardItemByProductIdAndCardId(cardId, productId);
+        CardItem cardItem2 = cardItemRepository.findCardItemByProductIdAndCardId(cardId, productId);
 
-        if (cardItem == null) {
+        if (cardItem2 == null) {
             throw new APIException("Product " + product.getProductName() + " not available in the cart!!!");
         }
 
-        double cartPrice = card.getTotalPrice()
-                - (cardItem.getProductPrice() * cardItem.getQuantity());
+        double cardPrice = card.getTotalPrice()
+                - (cardItem2.getProductPrice() * cardItem2.getQuantity());
 
-        cardItem.setProductPrice(product.getSpecialPrize());
-        card.setTotalPrice(cartPrice
-                + (cardItem.getProductPrice() * cardItem.getQuantity()));
+        cardItem2.setProductPrice(product.getSpecialPrize());
+        card.setTotalPrice(cardPrice
+                + (cardItem2.getProductPrice() * cardItem2.getQuantity()));
 
-        cardItem = cardItemRepository.save(cardItem);
+        cardItem2 = cardItemRepository.save(cardItem2);
     }
 
 }

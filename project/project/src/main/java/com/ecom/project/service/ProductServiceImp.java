@@ -251,6 +251,11 @@ public class ProductServiceImp implements ProductService {
 //       get the product from the db
         Product product = productRepository.findById(productId).
                 orElseThrow(()-> new ResourceNotFoundException("ProductDto","productId",productId));
+
+        List<Card> cards = cardRepository.findCardsByProductId(productId);
+        cards.forEach(cart -> cardService.deleteProductFromCard(cart.getCardId(), productId));
+
+
 //       then delete the product
         productRepository.delete(product);
 //        return

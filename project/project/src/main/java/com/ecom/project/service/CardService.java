@@ -18,5 +18,5 @@ public interface CardService {
 
     String deleteProductFromCard(Long cardId, Long productId);
 
-    ProductDto updateProductInCards(Long cardId, Long productId);
+    void updateProductInCards(Long cardId, Long productId);
 }

@@ -16,7 +16,7 @@ public interface CardRepository extends JpaRepository<Card,Long> {
     @Query("SELECT c FROM Card c WHERE c.user.email = ?1 AND c.id = ?2")
     Card findCardByEmailAndCardId(String emailId, Long cardId);
 
-    @Query("SELECT c FROM Card c JOIN FETCH c.cartItems ci JOIN FETCH ci.product p WHERE p.id = ?1")
+    @Query("SELECT c FROM Card c JOIN FETCH c.cardItems ci JOIN FETCH ci.product p WHERE p.id = ?1")
     List<Card> findCardsByProductId(Long productId);
 }
 
