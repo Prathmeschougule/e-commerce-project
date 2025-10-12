@@ -10,10 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@
+@RequestMapping("/api")
 public class AddressController {
 
     @Autowired
@@ -24,7 +25,6 @@ public class AddressController {
 
     @PostMapping("/addresses")
     public ResponseEntity<AddressDto>createAddress(@RequestBody AddressDto address){
-
         User user = authUtil.loggedInUser();
         AddressDto saveAddressDto = addressService.createAddress(address,user);
         return new ResponseEntity<AddressDto>(saveAddressDto, HttpStatus.CREATED);
