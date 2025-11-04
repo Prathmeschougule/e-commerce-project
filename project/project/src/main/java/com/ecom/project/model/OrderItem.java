@@ -3,8 +3,10 @@ package com.ecom.project.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @Entity
 @Table(name = "order_items")
 @AllArgsConstructor
@@ -27,6 +29,6 @@ public class OrderItem {
 
     private double discount;
 
-    private  double orderedProduct;
+    private  double orderedProductPrice;
 
 }

@@ -36,7 +36,7 @@ public class Order {
 
     @OneToOne
     @JoinColumn(name = "payment_id")
-    private  Payment payment;
+    private Payment payment;
 
     @ManyToOne
     @JoinColumn(name = "address_id")

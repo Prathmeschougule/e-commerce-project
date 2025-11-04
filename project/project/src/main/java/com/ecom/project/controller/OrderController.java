@@ -25,7 +25,7 @@ public class OrderController {
                                                  @RequestBody OrderRequestDTO orderRequestDTO){
 
         String emailId = authUtil.loggedInEmail();
-        OrderDTO orderDTO = orderService.placeOrder(
+        OrderDTO order = orderService.placeOrder(
                 emailId,
                 orderRequestDTO.getAddressId(),
                 paymentMethod,
@@ -35,7 +35,7 @@ public class OrderController {
                 orderRequestDTO.getPgResponseMessage()
         );
 
-        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
 }

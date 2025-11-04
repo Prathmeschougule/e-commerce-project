@@ -18,7 +18,7 @@ public class Payment {
     private Long paymentId;
 
 
-    @OneToOne(mappedBy = "payment" , cascade ={ CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToOne(mappedBy = "payment", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private Order order;
 
     @NotBlank
@@ -31,11 +31,23 @@ public class Payment {
     private String pgName;
 
 
-    public Payment(Long paymentId, String pgName, String pgResponseMessage, String pgStatus, String pgPaymentId) {
-        this.paymentId = paymentId;
-        this.pgName = pgName;
-        this.pgResponseMessage = pgResponseMessage;
-        this.pgStatus = pgStatus;
+    public Payment(String paymentMethod, String pgPaymentId, String pgStatus, String pgResponseMessage, String pgName) {
+        this.paymentMethod = paymentMethod;
         this.pgPaymentId = pgPaymentId;
+        this.pgStatus = pgStatus;
+        this.pgResponseMessage = pgResponseMessage;
+        this.pgName = pgName;
     }
+
+
+
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
 }
