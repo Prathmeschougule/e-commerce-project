@@ -11,7 +11,7 @@ function ProductViewModel({ open, setOpen, product, isAvailable }) {
     id,
     productName,
     image,
-    description,
+    productDescription,
     quantity,
     price,
     discount,
@@ -88,7 +88,7 @@ function ProductViewModel({ open, setOpen, product, isAvailable }) {
                     )}
                   </div>
                   <Divider/>
-                  <p>{description}</p>
+                  <p>{productDescription}</p>
                 </div>
                 <div className="mt-1 flex justify-end">
                   <Button

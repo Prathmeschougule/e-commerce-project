@@ -6,11 +6,11 @@ function ProductCard({
   productId,
   productName,
   image,
-  description,
+  productDescription,
   quantity,
   price,
   discount,
-  specialPrice,
+  specialPrize,
 }) {
   const [openProductViewModel, setOpenProductViewModel] = useState(false);
   const btnLoader = false;
@@ -23,6 +23,18 @@ function ProductCard({
     setOpenProductViewModel(true);
   };
 
+  console.log("Product Props:", {
+  productId,
+  productName,
+  image,
+  productDescription,
+  quantity,
+  price,
+  discount,
+  specialPrize,
+});
+
+
   return (
     <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300">
       <div onClick={() => {
@@ -30,11 +42,11 @@ function ProductCard({
               id: productId,
               productName,
               image,
-              description,
+              productDescription,
               quantity,
               price,
               discount,
-              specialPrice,
+              specialPrize,
             });
           }} className="w-full overflow-hidden aspect-3/2">
         <img
@@ -50,12 +62,12 @@ function ProductCard({
             handleProductView({
               id: productId,
               productName,
-              image,
-              description,
+              image,  
+              productDescription,
               quantity,
               price,
               discount,
-              specialPrice,
+              specialPrize,
             });
           }}
           className="text-lg font-semibold mb-2 cursor-pointer"
@@ -63,17 +75,17 @@ function ProductCard({
           {productName}
         </h2>
         <div className="min-h-20 max-h-20">
-          <p className="text-gray-600 text-sm">{description}</p>
+          <p className="text-gray-600 text-sm">{productDescription}</p>
         </div>
 
         <div className="flex items-center justify-between">
-          {specialPrice ? (
+          {specialPrize ? (
             <div className="flex flex-col">
               <span className="text-gray-400 line-through">
                 ${Number(price).toFixed(2)}
               </span>
               <span className="text-xl font-bold text-slate-700">
-                ${Number(specialPrice).toFixed(2)}
+                ${Number(specialPrize).toFixed(2)}
               </span>
             </div>
           ) : (
